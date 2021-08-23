@@ -10,18 +10,6 @@
 
 #define BUFFER_SIZE 4096
 
-void send_file(int sockfd, FILE *fp){
-    int n;
-    char data[BUFFER_SIZE] = {0};
-
-    while(fgets(data, BUFFER_SIZE, fp) != NULL){
-        if(send(sockfd, data, strlen(data), 0) < 0){
-            perror("send failed");
-            exit(1);
-        }
-        bzero(data, BUFFER_SIZE);
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -48,3 +36,41 @@ int main(int argc, char *argv[])
     buffer[n]='\0'; //clear buffer
 
     FILE *fp;
+    char filename[20];
+
+    printf("Enter the File name to transfer :");
+    scanf("%s",filename);
+
+    n = send(Clientsocket,filename,strlen(filename),0);
+    if(n<0){
+        perror("Send failed");
+        exit(1);
+    }
+    printf("file sent \n");
+
+    n = read(Clientsocket,buffer,255);
+    printf("size of file ::%d::",atoi(buffer));
+
+    fp = fopen("newfile.txt","w");
+    if(fp==NULL){
+        perror("File Not Found");
+        exit(1);
+    }
+    int file_data_remaining = atoi(buffer);
+
+    while(file_data_remaining>0){
+        n = recv(Clientsocket,buffer,255,0);
+        if(n<0){
+            perror("Recv failed");
+            exit(1);
+        }
+        fwrite(buffer,sizeof(char),n,fp);
+        file_data_remaining -= n;
+        printf("[+] %d bytes received and %d remaining\n",n,file_data_remaining);
+    }
+
+    fclose(fp);
+    close(Clientsocket);
+    printf("Socket Closed\n");
+    return 0;
+}

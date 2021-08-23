@@ -10,22 +10,6 @@
 
 #define BUFFER_SIZE 4096
 
-void send_file(int sockfd, FILE *fp){
-    int n;
-    char data[BUFFER_SIZE] = {0};
-
-    while(1){
-        if(fgets(data, BUFFER_SIZE, fp) != NULL){
-            printf("NULL found somehting happened");
-            break;
-        }
-        if(send(sockfd, data, strlen(data), 0) < 0){
-            perror("send failed");
-            exit(1);
-        }
-        bzero(data, BUFFER_SIZE);
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -44,9 +28,9 @@ int main(int argc, char *argv[])
 
     printf("Connection established...\n");
 
-    char buffer[255];
+    char buffer[BUFFER_SIZE];
 
-    int n = read(Clientsocket,buffer,255);
+    int n = read(Clientsocket,buffer,BUFFER_SIZE);
     printf("msg received :: %s",buffer);
 
     buffer[n]='\0'; //clear buffer
@@ -57,15 +41,42 @@ int main(int argc, char *argv[])
     printf("Enter the File name to transfer :");
     scanf("%s",filename);
 
-    fp = fopen(filename,"r");
-    if(fp == NULL){
-        perror("File not found");
+    n = send(Clientsocket,filename,strlen(filename),0);
+    if(n<0){
+        perror("Send failed");
         exit(1);
     }
-    send_file(Clientsocket, fp);
+    printf("filename sent \n");
 
-    printf("file send successfully \n");
+    n = recv(Clientsocket,buffer,BUFFER_SIZE,0);
+    if(n<0){
+        perror("recv failed");
+        exit(1);
+    }
+    printf("size of file ::%d::",atoi(buffer));
 
+    
+    
+    fp = fopen("newfile.c","w");
+    if(fp==NULL){
+        perror("File Not Found");
+        exit(1);
+    }
+
+    int file_data_remaining = atoi(buffer);
+
+    while(file_data_remaining>0){
+        n = recv(Clientsocket,buffer,BUFFER_SIZE,0);
+        if(n<0){
+            perror("Recv failed");
+            exit(1);
+        }
+        fwrite(buffer,sizeof(char),n,fp);
+        file_data_remaining -= n;
+        printf("[+] %d bytes received and %d remaining\n",n,file_data_remaining);
+    }
+
+    fclose(fp);
     close(Clientsocket);
     printf("Socket Closed\n");
     return 0;
