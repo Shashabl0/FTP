@@ -8,8 +8,23 @@
 #include <netdb.h> 
 #include<ctype.h>
 
-#define BUFFER_SIZE 4096
 
+#define min(a,b) a<b?a:b
+#define BUFFER_SIZE 1024
+
+int write_file(int clientsocket, FILE *fp,int size){
+    
+    char buffer[BUFFER_SIZE] = {0};
+    memset(buffer,'0',BUFFER_SIZE);
+    int i=0;
+    int n = recv(clientsocket,buffer,sizeof(buffer),0);
+    while(n>0 && buffer[i] != '\0' && i<size){
+        putc(buffer[i],fp);
+        // printf("%d ",i);
+        i++;
+    }
+    return n;
+}
 
 int main(int argc, char *argv[])
 {
@@ -30,8 +45,10 @@ int main(int argc, char *argv[])
 
     char buffer[BUFFER_SIZE];
 
+    memset(buffer,'\0',BUFFER_SIZE);
+
     int n = read(Clientsocket,buffer,BUFFER_SIZE);
-    printf("msg received :: %s",buffer);
+    printf("msg received :: %s::",buffer);
 
     buffer[n]='\0'; //clear buffer
 
@@ -53,7 +70,7 @@ int main(int argc, char *argv[])
         perror("recv failed");
         exit(1);
     }
-    printf("size of file ::%d::",atoi(buffer));
+    printf("size of file ::%d::\n",atoi(buffer));
 
     
     
@@ -64,14 +81,19 @@ int main(int argc, char *argv[])
     }
 
     int file_data_remaining = atoi(buffer);
-
     while(file_data_remaining>0){
-        n = recv(Clientsocket,buffer,BUFFER_SIZE,0);
-        if(n<0){
+        // memset(buffer,'0',sizeof(buffer));
+        // n = recv(Clientsocket,buffer,sizeof(buffer),0);
+        // fwrite(buffer,sizeof(char),n,fp);
+        n = write_file(Clientsocket,fp,file_data_remaining);
+        if(n<0 ){
             perror("Recv failed");
             exit(1);
         }
-        fwrite(buffer,sizeof(char),n,fp);
+        if(n == 0)
+        break;
+        // fprintf(fp,"%s",buffer);
+        n = min(file_data_remaining,n);
         file_data_remaining -= n;
         printf("[+] %d bytes received and %d remaining\n",n,file_data_remaining);
     }

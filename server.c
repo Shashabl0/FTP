@@ -10,9 +10,27 @@
 #include <sys/stat.h>
 #include <sys/sendfile.h>
 
-#define BUFFER_SIZE 4096
+
+#define min(a,b) a<b?a:b
+#define BUFFER_SIZE 1024
 
 
+int send_file(int clientsocket, FILE *fp){
+    
+    char ch;
+    char buffer[BUFFER_SIZE];
+    int i=0;
+    memset(buffer,'0',BUFFER_SIZE);
+    while((ch = getc(fp))!=EOF && i < BUFFER_SIZE-1){
+        buffer[i] = ch;
+        // printf("%d ",i);
+        i++;
+    }
+    buffer[i] = '\0';
+    send(clientsocket,buffer,sizeof(buffer),0);
+    // puts(buffer);
+    return sizeof(buffer);
+}
 int main(int argc, char *argv[]){
     
     
@@ -66,7 +84,7 @@ int main(int argc, char *argv[]){
     struct stat file_stat;
     // Get file stats;
     int fd;
-    if(lstat("test.c",&file_stat)<0){
+    if(lstat(filename,&file_stat)<0){
         perror("File Stat failed\n");
         exit(1);
     }
@@ -87,15 +105,14 @@ int main(int argc, char *argv[]){
     int file_size_rem = file_stat.st_size;
     int offset= 0;
     while(file_size_rem > 0){
-        sprintf()
-        n = send(clientsocket,fp,&offset,BUFFER_SIZE);
+        n = send_file(clientsocket,fp);
         if(n<0){
             perror("Send failed\n");
             exit(1);
         }
-        // printf("[1] %d bytes Sent and %d remaining\n",n,file_size_rem);
+        n = min(file_size_rem,n);
         file_size_rem -= n;
-        // printf("[2] %d bytes Sent and %d remaining\n",n,file_size_rem);
+        printf("[+] %d bytes Sent and %d remaining\n",n,file_size_rem);
 
     }
     close(clientsocket);
