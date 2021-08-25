@@ -4,7 +4,7 @@ A TCP Client-Server program is used to transfer data between two computers. Here
 
 ( Basically if we add _list directory function_ in the server- where we can see the files in the server dir and then get the file to the client or similar to _GET cmd in FTP_)
 
-[Preview1](https://drive.google.com/uc?export=view&id=1hpNgbTju0nt7uLWwAYSZ6WwVCxVm8xMp)
+![Preview1](https://drive.google.com/uc?export=view&id=1hpNgbTju0nt7uLWwAYSZ6WwVCxVm8xMp)
 
 Use Makefile to compile the program.</br>
 * make server --- Compile the server program.
