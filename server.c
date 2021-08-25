@@ -59,14 +59,12 @@ int main(int argc, char *argv[]){
     if(clientsocket <0)
         perror("accept failed");
     
-    int n = write(clientsocket,"Connected check\n",strlen("Connected check\n"));
-
+    // int n = write(clientsocket,"Connected check\n",strlen("Connected check\n"));
 
     FILE *fp;
-
     char filename[50];
-    
-    n = read(clientsocket,filename,50);
+
+    int n = read(clientsocket,filename,50);
     if(n<0){
         perror("read failed");
         exit(1);

@@ -3,3 +3,7 @@
 v1.c
 newfile.c
 test.c
+
+# exe files
+client
+server

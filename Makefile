@@ -7,6 +7,4 @@ client:
 clean:
 	rm -f server client
 
-all: server client
-
-update: clean all
+update: clean server client

@@ -44,13 +44,10 @@ int main(int argc, char *argv[])
     printf("Connection established...\n");
 
     char buffer[BUFFER_SIZE];
-
     memset(buffer,'\0',BUFFER_SIZE);
-
-    int n = read(Clientsocket,buffer,BUFFER_SIZE);
-    printf("msg received :: %s::",buffer);
-
-    buffer[n]='\0'; //clear buffer
+    // int n = read(Clientsocket,buffer,BUFFER_SIZE);
+    // printf("msg received :: %s::",buffer);
+    // buffer[n]='\0'; //clear buffer
 
     FILE *fp;
     char filename[20];
@@ -58,7 +55,7 @@ int main(int argc, char *argv[])
     printf("Enter the File name to transfer :");
     scanf("%s",filename);
 
-    n = send(Clientsocket,filename,strlen(filename),0);
+    int n = send(Clientsocket,filename,strlen(filename),0);
     if(n<0){
         perror("Send failed");
         exit(1);
