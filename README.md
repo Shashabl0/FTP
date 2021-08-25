@@ -1,4 +1,4 @@
-# File Transfer Using TCP in C Programming
+# TCP File Transfer in C Programming
 
 A TCP Client-Server program is used to transfer data between two computers. Here you enter the filename in the client which is send to the server and the server sends the file back to the client.<br>
 
